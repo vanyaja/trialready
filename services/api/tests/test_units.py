@@ -135,3 +135,18 @@ def test_webhook_signature():
     assert not verify_signature(body, f"t={ts},v0={'0' * 64}", secret)
     assert not verify_signature(body, f"t={int(ts) - 99999},v0={sig}", secret)
     assert not verify_signature(body, None, secret)
+
+
+def test_live_only_router_never_falls_back_to_mock():
+    """Benchmark/smoke mode: a failing live backend yields no answer, never a mock answer labelled as Jev."""
+    class Boom:
+        name, model, key, down_until, resolved_model = "typesafe", "jev-latest", "x", 0.0, None
+
+        async def decide(self, client, state, questions):
+            raise RuntimeError("provider down")
+
+    r = JevRouter(live_only=True)
+    r.backends, r.preferred, r.last_backend = [Boom()], "typesafe", "typesafe"
+    out = asyncio.run(r.decide({"answer": "hi"}, {"c": criterion_question("inclusion", "Age 18 or over")}))
+    assert out == {} and "mock" not in r.stats["by_backend"]
+    assert JevRouter(live_only=False).backends[-1].name == "mock"  # app keeps its offline fallback

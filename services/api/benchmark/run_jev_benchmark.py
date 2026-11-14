@@ -92,11 +92,15 @@ async def main(n: int, mock: bool, baseline: bool, baseline_n: int) -> dict:
     s = get_settings()
     data = load()
     sample = stratified_sample(data["rows"], n)
-    router = JevRouter(force_mock=mock)
+    # live_only: a failed live request leaves pairs unanswered instead of silently filling them with MockJev output
+    router = JevRouter(force_mock=mock, live_only=not mock)
     if router.preferred == "mock" and not mock:
         raise SystemExit("No Jev key configured. Set TYPESAFE_API_KEY / OPENROUTER_API_KEY / AIMLAPI_API_KEY in .env, or pass --mock for a pipeline smoke test.")
     records, per_dec = await run_jev(sample, data["notes"], router)
     snap = router.snapshot()
+    if not mock and (not records or "mock" in snap["by_backend"]):
+        raise SystemExit(f"Live Jev run produced {len(records)} answers (backends used: {list(snap['by_backend'])}); "
+                         f"{BENCH_RESULTS.name} left unchanged. Check the key, quota and the warnings above.")
     drop, drop_rs = score(records, None)
     fold, _ = score(records, "unknown")
     tg_pairs = [(map_label(r["expert"], None), map_label(r["trialgpt"], "unknown")) for r in records if map_label(r["expert"], None)]
@@ -104,6 +108,7 @@ async def main(n: int, mock: bool, baseline: bool, baseline_n: int) -> dict:
     out = {
         "created_at": datetime.now(timezone.utc).isoformat(), "model": snap["model"], "mock": snap["mock"], "fallback_mode": snap["fallback_mode"],
         "warning": "MOCK RUN: keyword rules, not Jev. These numbers are a pipeline smoke test and say nothing about any model." if snap["mock"] else None,
+        "backends_used": snap["by_backend"], "provider_errors": snap["errors"],
         "dataset": {"name": "ncbi/TrialGPT-Criterion-Annotations", "total_pairs": len(data["rows"]), "sampled": len(sample), "answered": len(records),
                     "sampling": "stratified by criterion type x expert label, seed 7"},
         "mappings": {

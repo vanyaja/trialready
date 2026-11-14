@@ -137,3 +137,35 @@ def test_benchmark_outputs(tmp_path, monkeypatch):
     assert out["latency"]["request_p50_ms"] is not None and out["latency"]["request_p95_ms"] is not None
     assert out["cost"]["usd_per_1000_criteria"] > 0 and (tmp_path / "results.json").exists()
     assert any(r.get("reported_not_rerun") for r in out["comparison"])
+
+
+def test_real_calls_only_to_allowlisted_numbers(seeded, monkeypatch):
+    """With ElevenLabs + Twilio configured, a registry number NOT in OUTBOUND_ALLOWLIST still gets a simulated call."""
+    from services.api.config import get_settings
+    from services.api.models import ContactDetail
+    from services.api.voice import outbound
+
+    s = get_settings()
+    monkeypatch.setattr(s, "elevenlabs_api_key", "test-key")
+    monkeypatch.setattr(s, "elevenlabs_recall_agent_id", "agent")
+    monkeypatch.setattr(s, "elevenlabs_phone_number_id", "phone")
+    monkeypatch.setattr(s, "outbound_allowlist", "+447700900001")
+    placed = []
+
+    async def fake_real(call_id, referral_id, to_number, dv):
+        placed.append(to_number)
+    monkeypatch.setattr(outbound, "_elevenlabs_call", fake_real)
+
+    async def flow():
+        with db_session() as db:
+            ref = db.exec(select(Referral)).first()
+            if not db.get(ContactDetail, ref.profile_id):
+                db.add(ContactDetail(profile_id=ref.profile_id, phone_e164="+447700900999"))  # not allowlisted
+            db.commit()
+            rid = ref.id
+        v = await outbound.place_call(rid)
+        await asyncio.sleep(0.05)
+        return v
+    view = asyncio.run(flow())
+    assert view["mode"] == "sim" and placed == []
+    assert s.outbound_allowed_numbers == {"+447700900001"}

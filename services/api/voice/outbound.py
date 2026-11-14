@@ -53,7 +53,10 @@ async def place_call(referral_id: int, force_sim: bool = False) -> dict:
         plan = recheck_plan(prof, ref.trial_id)
         ref.recheck = {"plan": plan, "answers": {}}
         db.add(ref)
-        real = bool(s.elevenlabs_outbound_ready and contact and not force_sim)
+        allowed = bool(contact and contact.phone_e164 and contact.phone_e164.replace(" ", "") in s.outbound_allowed_numbers)
+        if s.elevenlabs_outbound_ready and contact and not force_sim and not allowed:
+            log.info("referral %s: number not in OUTBOUND_ALLOWLIST - simulated call instead of a real one", referral_id)
+        real = bool(s.elevenlabs_outbound_ready and allowed and not force_sim)
         call = CallLog(direction="outbound", mode="elevenlabs" if real else "sim", profile_id=prof.id, trial_id=ref.trial_id, referral_id=ref.id, status="dialing")
         db.add(call)
         db.commit()

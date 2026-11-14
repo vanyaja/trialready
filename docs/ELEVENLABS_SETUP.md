@@ -3,12 +3,28 @@
 Everything below is configuration in the ElevenLabs dashboard; the code is already written against it.
 Dashboard labels change — where a label differs, look for the nearest equivalent. Items marked **verify** were not testable without an account.
 
+## Fast path: scripted setup (recommended)
+Sections 1, 2 and 4 below are automated by `scripts/setup_elevenlabs.py` (payloads validated against `api.elevenlabs.io/openapi.json`, 14 Nov 2026; not yet run against a live account):
+
+    python scripts/setup_elevenlabs.py --check             # lists missing .env values; calls nothing
+    python scripts/setup_elevenlabs.py --dry-run           # prints every payload (secrets redacted); calls nothing
+    python scripts/setup_elevenlabs.py                     # creates/updates: workspace secret, 8 webhook tools, Intake + Recall agents, post-call webhook
+    python scripts/setup_elevenlabs.py --import-twilio     # also imports an EXISTING Twilio number and assigns it to Intake (never buys one)
+
+It writes `ELEVENLABS_INTAKE_AGENT_ID`, `ELEVENLABS_RECALL_AGENT_ID`, `ELEVENLABS_WEBHOOK_ID`, `ELEVENLABS_WEBHOOK_SECRET` (and `ELEVENLABS_PHONE_NUMBER_ID`) into `.env` without printing them. Restart the API afterwards.
+The `X-Tool-Secret` header value is stored as an ElevenLabs workspace secret (`trialready_tool_secret`), not in plain text on the tools.
+Second language: `--second-language pl` (default) adds a Polish preset, `eleven_flash_v2_5` TTS and the language-detection tool; `--second-language none` skips it. The Polish first message is machine-drafted: have a native speaker check it.
+Re-run the script whenever the tunnel URL changes (the webhook URL cannot be edited, so it creates a new webhook and a new signing secret).
+
 ## 0. Public URL
 ElevenLabs must reach your FastAPI server over HTTPS:
 
     cloudflared tunnel --url http://localhost:8000
 
-Put the URL in `.env` as `PUBLIC_API_BASE_URL` (reference only) and use it as `<BASE>` below. Set `TOOL_SHARED_SECRET` to a random string.
+(Windows: `"C:\Program Files (x86)\cloudflared\cloudflared.exe" tunnel --url http://localhost:8000`.)
+cloudflared needs outbound **port 7844** (UDP for QUIC, or TCP for HTTP/2). Networks such as eduroam block it: the log shows `Allow outbound QUIC traffic on port 7844` and the URL returns Cloudflare error 1033. Switch to a phone hotspot, or deploy the API (Railway/Render) instead.
+
+Put the URL in `.env` as `PUBLIC_API_BASE_URL` and use it as `<BASE>` below. Set `TOOL_SHARED_SECRET` to a random string. The tool endpoints accept any request while it is empty, so never expose the API through the tunnel without it.
 
 ## 1. Intake agent
 - Create agent **TrialReady Intake**. First message: the text in spec §9.1 (also `FIRST_MESSAGE` in `services/api/voice/tools_intake.py`).
@@ -63,8 +79,9 @@ Put the agent ID in `.env` as `ELEVENLABS_RECALL_AGENT_ID`.
 ## 5. Phones for the "phones ring" moment
 1. A teammate does a real intake (web or phone) and says yes to future contact. On the web call the agent asks for the number; on a phone call the caller ID is used.
    Or: `/registry` → "+ add" attaches a consenting attendee's number to a registry profile.
-2. `/admin` → "Simulate new trial opening" (leave "simulated calls only" unticked). Members with a number get a real call; everyone else gets a simulated call you can answer in the browser.
-3. If ElevenLabs/Twilio returns an error, that call silently becomes a simulated one — the demo keeps going.
+2. Add each phone that may receive a real call to `OUTBOUND_ALLOWLIST` in `.env` (comma-separated E.164) and restart the API. Numbers not on the list never get a real call.
+3. `/admin` → "Simulate new trial opening" (leave "simulated calls only" unticked). Members whose number is on the allowlist get a real call; everyone else gets a simulated call you can answer in the browser.
+4. If ElevenLabs/Twilio returns an error, that call silently becomes a simulated one — the demo keeps going.
 
 ## Checklist before going on stage
 - [ ] `curl <BASE>/api/health` returns `{"ok":true}` from outside your laptop

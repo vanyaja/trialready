@@ -15,9 +15,9 @@ AI Cup 2026 · Track D (Science & Engineering). Full build spec: [`AGENTS.md`](A
 | Rematch + recall: new trial → re-score registry → outbound call → re-check 1–2 things → book a slot → referral | Working end to end |
 | Nurse dashboard, registry, equity view (real Census 2021 figures), benchmark page | Working |
 | Trial data | 41 real UK interventional type 2 diabetes trials from ClinicalTrials.gov (35 recruiting + 6 not yet recruiting), fetched 14 Nov 2026, 669 atomic criteria |
-| **Jev** | Adapter for TypeSafe native → OpenRouter → AIML API is written and unit-tested against the documented schema, **but has never been called with a real key**. With no key the app runs on `MockJev` (keyword rules) and says so in the header badge |
-| **ElevenLabs / Twilio** | Tool endpoints, outbound-call client, signed post-call webhook and the web SDK component are written. **Not exercised against a live account.** Without credentials: a built-in scripted agent (typed or browser speech) and simulated calls you can answer in the browser |
-| Benchmark | Pipeline runs on the 1,015 TrialGPT expert annotations. The committed `results.json` is a **mock run** and is labelled as such on the page. It is not a result |
+| **Jev** | Adapter for TypeSafe native → OpenRouter → AIML API is written and unit-tested against the documented schema, **but has not yet been called with a real key** (no key in `.env` as of 14 Nov, 10:00). `python scripts/jev_smoke.py` makes one real request per configured provider with no mock fallback. With no key the app runs on `MockJev` (keyword rules) and says so in the header badge |
+| **ElevenLabs / Twilio** | Tool endpoints, outbound-call client, signed post-call webhook and the web SDK component are written; `scripts/setup_elevenlabs.py` creates the tools, both agents (English + Polish preset) and the webhook from `.env` (payloads validated against the ElevenLabs OpenAPI schema). **Not yet run against a live account.** Real outbound calls only go to numbers in `OUTBOUND_ALLOWLIST`. Without credentials: a built-in scripted agent (typed or browser speech) and simulated calls you can answer in the browser |
+| Benchmark | Pipeline runs on the 1,015 TrialGPT expert annotations. The committed `results.json` is a **mock run** and is labelled as such on the page. It is not a result. A live run uses no mock fallback: if Jev fails, `results.json` is left unchanged rather than filled with mock answers |
 
 ## Quick start (no keys needed)
 
@@ -25,7 +25,7 @@ Requirements: Python 3.10+ and Node 18+.
 
 **Windows (PowerShell)**
 ```powershell
-cd D:\trialready
+cd <path-to>\trialready
 py -3 -m venv .venv ; .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 copy .env.example .env
@@ -33,9 +33,9 @@ uvicorn services.api.main:app --port 8000
 ```
 Second terminal:
 ```powershell
-cd D:\trialready\apps\web
-npm install
-npm run dev
+cd <path-to>\trialready\apps\web
+npm ci
+npm run dev          # or: npm run build ; npm run start
 ```
 
 **macOS / Linux**
@@ -60,22 +60,23 @@ Reset between rehearsals: `python scripts/seed_demo.py --reset` (or *Reset demo 
 
 ## Switching on the real services
 
-1. **Jev** — put a key in `.env` (`TYPESAFE_API_KEY`, or `OPENROUTER_API_KEY` / `AIMLAPI_API_KEY` as fallbacks) and restart. The header badge turns green; if the preferred provider fails the router falls back down the chain and the badge says so. Then:
+1. **Jev** — put a key in `.env` (`TYPESAFE_API_KEY`, or `OPENROUTER_API_KEY` / `AIMLAPI_API_KEY` as fallbacks). Then:
    ```bash
-   python -m services.api.benchmark.run_jev_benchmark --n 500            # writes data/benchmark/results.json
-   python -m services.api.benchmark.run_jev_benchmark --n 200 --baseline # + generative-LLM row on the same pairs
+   python scripts/jev_smoke.py                                           # one real request per provider; no mock fallback; prints resolved model + parsed answer
+   python -m services.api.benchmark.run_jev_benchmark --n 500            # writes data/benchmark/results.json (live-only)
    ```
-   First thing to check with a real key: one request in the logs returns answers (the adapter accepts `answers` or `decisions` at the top level; anything else raises and falls back to mock — you will see the badge).
-2. **ElevenLabs + Twilio** — follow [`docs/ELEVENLABS_SETUP.md`](docs/ELEVENLABS_SETUP.md).
+   Restart the API: the header badge turns green; if the preferred provider fails the router falls back down the chain (ending at MockJev) and the badge says so.
+   Model IDs: TypeSafe native `jev-latest` (alias for the current release), AIML API `typesafe/jev`, OpenRouter `typesafe/jev-1.13` (pinned; bare `jev-latest` is also mapped onto the `typesafe/` namespace there). The resolved version is recorded from the response's `model` field.
+2. **ElevenLabs + Twilio** — start the tunnel, set `ELEVENLABS_API_KEY` and `PUBLIC_API_BASE_URL` in `.env`, then `python scripts/setup_elevenlabs.py --check` and `python scripts/setup_elevenlabs.py` (details and the manual fallback: [`docs/ELEVENLABS_SETUP.md`](docs/ELEVENLABS_SETUP.md)). Put the phone numbers that may receive real calls in `OUTBOUND_ALLOWLIST`.
 3. **Better criteria text** — with `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`: `python -m services.api.trials.ingest_ctgov --from-raw --llm` re-atomises the criteria and rewrites the plain-English text with the offline LLM, then restart (or `/admin` → Re-ingest).
 4. **Fresh trials** — `python -m services.api.trials.ingest_ctgov` (live fetch), or the nightly 02:00 job.
 
 ## Tests
 
 ```bash
-python -m pytest services/api/tests -q      # 14 tests, ~15 s, no network, no keys
+python -m pytest services/api/tests -q      # 16 tests, ~20 s, no network, no keys
 ```
-Covers spec §23: atomiser schema, scoring maths (`P_pes ≤ P_opt`, knock-out), adaptive topic choice, guard routing, persona replay (≤ 8 questions; heart-attack persona knocked out of cardio-exclusion trials), emergency phrase, "remove me", tool-secret enforcement, new trial → ≥ 2 outbound calls → booking visible to the nurse, browser-answered call, webhook signature, benchmark output.
+Covers spec §23: atomiser schema, scoring maths (`P_pes ≤ P_opt`, knock-out), adaptive topic choice, guard routing, live-only Jev mode never returns mock answers, persona replay (≤ 8 questions; heart-attack persona knocked out of cardio-exclusion trials), emergency phrase, "remove me", tool-secret enforcement, new trial → ≥ 2 outbound calls → booking visible to the nurse, browser-answered call, real calls only to allowlisted numbers, webhook signature, benchmark output.
 
 Not covered by tests (needs accounts): live ElevenLabs web call latency, real outbound calls, real Jev responses.
 
@@ -94,12 +95,12 @@ Not covered by tests (needs accounts): live ElevenLabs web call latency, real ou
 | Item | Status |
 |---|---|
 | Jev request/response field names | `state` + `questions{type, instructions, criteria}` → `choice / confidence / probabilities`, `noul` confirmed from the AIML API docs. TypeSafe-native and OpenRouter payloads **not verified with a key**. Max questions per request and rate limits: unknown |
-| Jev model IDs | AIML API lists `typesafe/jev` (currently Jev 1.14, released 14 Oct 2026). The spec's OpenRouter ID `typesafe/jev-1.13` may be stale — check before relying on that fallback |
+| Jev model IDs | TypeSafe native `jev-latest` (alias); AIML API `typesafe/jev` (Jev 1.14 per its docs); OpenRouter documents `typesafe/jev-1.13` and maps bare `jev-latest` onto `typesafe/`. Not yet confirmed with a key — `scripts/jev_smoke.py` prints the resolved model |
 | Count of UK T2D trials | 35 recruiting interventional with a UK site (< 40), so `NOT_YET_RECRUITING` was added → 41. Several are obesity, type 1 or unrelated trials that merely mention type 2 diabetes; they are knocked out by their own criteria |
 | TrialGPT annotations | 1,015 rows; columns and label set verified; trimmed copy committed |
-| ElevenLabs | Outbound endpoint + body, webhook signature scheme, `@elevenlabs/react` 1.22 (`ConversationProvider` + `useConversation`) verified from docs/types. System dynamic variables, server-tool UI and second-language support: **verify in the dashboard** |
-| Twilio | Not done (needs your account). Trial accounts call verified numbers only |
-| Tunnel | Not done |
+| ElevenLabs | Outbound endpoint + body, webhook signature scheme, `@elevenlabs/react` pinned to 1.22.1 (`ConversationProvider` + `useConversation`). Tool/agent/webhook/phone-import payloads validated against `api.elevenlabs.io/openapi.json` (14 Nov). Second language: Polish preset with `eleven_flash_v2_5` + language detection; the Polish first message is machine-drafted — **have a native speaker check it**. Not yet run with a key |
+| Twilio | Not done: no Twilio values in `.env`. The setup script imports an existing number only (never buys). Trial accounts call verified numbers only |
+| Tunnel | `cloudflared` 2026.11.0 installed. On eduroam the tunnel cannot connect: outbound port 7844 (TCP and UDP) is blocked, 443 is open. Use a phone hotspot or the Railway/Render backup |
 
 ## How it is built
 
@@ -141,8 +142,8 @@ Sources are listed in `AGENTS.md` §2.
 ## Limitations
 
 - MockJev is a keyword rule engine. It makes mistakes a model would not (and vice versa). Do not present mock output as model output.
-- The rule-based atomiser is faithful (it never invents text) but coarse; run the LLM atomiser before judging.
-- English only in the built-in agent; multilingual depends on the ElevenLabs agent.
+- The rule-based atomiser is faithful (it never invents text) but coarse. All 41 trials currently use it (`atomize_source: rule`); the LLM atomiser has not been run.
+- English only in the built-in agent; the second language (Polish) exists only in the ElevenLabs agent configuration, which has not yet been tested live.
 - Site geo-points from ClinicalTrials.gov are city-level; distances are approximate.
 - Appointment slots are demo data. The "confirmation text" is not sent.
 - Regulatory status (MHRA software as a medical device) has not been assessed. Health data is UK GDPR special-category data: explicit consent, minimisation, deletion on request are implemented for the demo; a DPIA is not.

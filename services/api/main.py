@@ -351,7 +351,8 @@ def stats():
             "registry_members": members, "referrals": by(refs, "status"), "referral_bands": by(refs, "band"), "calls": by(cl, "status"),
             "jev": get_router().snapshot(),
             "voice": {"elevenlabs_intake_agent": bool(s.elevenlabs_intake_agent_id), "outbound_ready": s.elevenlabs_outbound_ready,
-                      "webhook_signed": bool(s.elevenlabs_webhook_secret), "tool_secret_set": bool(s.tool_shared_secret)},
+                      "webhook_signed": bool(s.elevenlabs_webhook_secret), "tool_secret_set": bool(s.tool_shared_secret),
+                      "outbound_allowlist_count": len(s.outbound_allowed_numbers)},
             "pes_mode": s.pes_mode}
 
 

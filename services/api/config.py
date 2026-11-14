@@ -42,7 +42,16 @@ class Settings(BaseSettings):
     elevenlabs_recall_agent_id: str = ""
     elevenlabs_phone_number_id: str = ""
     elevenlabs_webhook_secret: str = ""
+    elevenlabs_webhook_id: str = ""
     tool_shared_secret: str = ""
+    # Real outbound calls go ONLY to these E.164 numbers (comma-separated). Empty = no real calls; everyone gets a simulated call.
+    outbound_allowlist: str = ""
+    # Twilio (only used by scripts/setup_elevenlabs.py to import an existing number into ElevenLabs)
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_api_key_sid: str = ""
+    twilio_api_key_secret: str = ""
+    twilio_phone_number: str = ""
 
     # --- Offline generative LLM (preprocessing only) ---
     offline_llm_provider: str = "anthropic"
@@ -69,6 +78,10 @@ class Settings(BaseSettings):
         if url.startswith("sqlite:///./"):
             return "sqlite:///" + str(ROOT / url[len("sqlite:///./"):])
         return url
+
+    @property
+    def outbound_allowed_numbers(self) -> set[str]:
+        return {n.strip().replace(" ", "") for n in self.outbound_allowlist.split(",") if n.strip()}
 
     @property
     def elevenlabs_outbound_ready(self) -> bool:

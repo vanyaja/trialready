@@ -60,12 +60,16 @@ class HttpJevBackend:
     def __init__(self, name: str, url: str, key: str, model: str):
         self.name, self.url, self.key, self.model = name, url, key, model
         self.down_until = 0.0
+        self.resolved_model: Optional[str] = None  # the version the provider says answered (response "model" field)
 
     async def decide(self, client: httpx.AsyncClient, state: Any, questions: dict) -> tuple[dict, dict]:
         r = await client.post(self.url, headers={"Authorization": f"Bearer {self.key}", "Content-Type": "application/json"},
                               json={"model": self.model, "state": state, "questions": questions})
-        r.raise_for_status()
+        if r.status_code >= 400:  # never echo request headers (they carry the key); body excerpt only
+            raise httpx.HTTPStatusError(f"{self.name}: HTTP {r.status_code}: {r.text[:200]}", request=r.request, response=r)
         data = r.json()
+        if isinstance(data.get("model"), str):
+            self.resolved_model = data["model"]
         answers = data.get("answers") or data.get("decisions") or (data.get("data") or {}).get("answers") or {}
         norm = normalize_answers(questions, answers)
         if not norm:
@@ -143,9 +147,12 @@ class MockJevBackend:
 
 
 class JevRouter:
-    def __init__(self, force_mock: bool = False):
+    def __init__(self, force_mock: bool = False, live_only: bool = False):
+        """live_only: no MockJev fallback - a failed live call returns no answer instead of a mock one.
+        Used by the benchmark and the smoke test so mock output can never be reported as a live Jev result."""
         s = get_settings()
         self.s = s
+        self.live_only = live_only and not force_mock
         http = {
             "typesafe": HttpJevBackend("typesafe", s.typesafe_base_url, s.typesafe_api_key, s.jev_model),
             "openrouter": HttpJevBackend("openrouter", s.openrouter_jev_url, s.openrouter_api_key, s.openrouter_jev_model),
@@ -157,7 +164,8 @@ class JevRouter:
             order.insert(0, s.jev_provider)
         self.mock = MockJevBackend()
         self.backends: list = [] if (force_mock or s.mock_jev or s.jev_provider == "mock") else [http[n] for n in order if http[n].key]
-        self.backends.append(self.mock)
+        if not self.live_only or not self.backends:
+            self.backends.append(self.mock)
         self.preferred = self.backends[0].name
         self.last_backend = self.preferred
         self.cache: dict[str, dict] = {}
@@ -178,7 +186,8 @@ class JevRouter:
     @property
     def model_label(self) -> str:
         b = next((b for b in self.backends if b.name == self.last_backend), self.mock)
-        return f"{b.name}:{b.model}"
+        resolved = getattr(b, "resolved_model", None)
+        return f"{b.name}:{b.model}" + (f" ({resolved})" if resolved and resolved != b.model else "")
 
     async def _one_batch(self, state: Any, batch: dict, sem: asyncio.Semaphore) -> dict:
         async with sem:
