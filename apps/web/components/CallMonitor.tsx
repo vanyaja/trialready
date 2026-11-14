@@ -69,10 +69,10 @@ export default function CallMonitor() {
       <div className="mt-2 divide-y divide-surface-line/60">
         {calls.map((c) => (
           <div key={c.call_id} className="flex items-center gap-3 py-2.5">
-            <span className={`text-xl ${c.status === "ringing" || c.status === "dialing" ? "ringing" : ""}`}>{c.mode === "sim" ? "💻" : "📞"}</span>
+            <span className={`text-xl ${c.status === "ringing" || c.status === "dialing" ? "ringing" : ""}`}>{c.mode === "sim" ? "💻" : c.mode === "whatsapp" ? "💬" : "📞"}</span>
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-medium">{c.person} <span className="font-normal text-ink-mute">· {c.lay_title}</span></div>
-              <div className="truncate text-xs text-ink-mute">{c.mode === "sim" ? "simulated call" : "phone (ElevenLabs + Twilio)"}{c.summary ? ` · ${c.summary}` : ""}</div>
+              <div className="truncate text-xs text-ink-mute">{c.mode === "sim" ? "simulated call" : c.mode === "whatsapp" ? "WhatsApp (Twilio)" : "phone (ElevenLabs + Twilio)"}{c.summary ? ` · ${c.summary}` : ""}</div>
             </div>
             {c.mode === "sim" && c.status === "ringing" && <button className="btn-primary !py-1.5 text-xs" onClick={() => setAnswering(c)}>Answer in browser</button>}
             <span className={`chip ${STATUS[c.status]?.[1] ?? ""}`}>{STATUS[c.status]?.[0] ?? c.status}</span>

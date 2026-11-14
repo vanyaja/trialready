@@ -8,7 +8,7 @@ from sqlalchemy import delete  # noqa: E402
 from sqlmodel import select  # noqa: E402
 
 from services.api.db import db_session, init_db  # noqa: E402
-from services.api.models import ContactDetail, Profile  # noqa: E402
+from services.api.models import ContactDetail, Profile, WhatsAppContact, WhatsAppThread  # noqa: E402
 from services.api.voice.tools_intake import delete_profile_data  # noqa: E402
 
 if __name__ == "__main__":
@@ -17,13 +17,15 @@ if __name__ == "__main__":
     a = ap.parse_args()
     init_db()
     with db_session() as db:
-        phones = len(db.exec(select(ContactDetail)).all())
+        phones = len(db.exec(select(ContactDetail)).all()) + len(db.exec(select(WhatsAppContact)).all())
         real = db.exec(select(Profile).where(Profile.persona_id == None)).all()  # noqa: E711
         print(f"{phones} phone numbers, {len(real)} non-synthetic profiles")
         if not a.yes:
             print("dry run; pass --yes to delete")
             sys.exit(0)
         db.exec(delete(ContactDetail))
+        db.exec(delete(WhatsAppContact))
+        db.exec(delete(WhatsAppThread))
         for p in real:
             delete_profile_data(db, p.id, p.session_id)
         db.commit()

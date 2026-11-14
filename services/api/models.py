@@ -168,3 +168,18 @@ class BenchmarkRun(SQLModel, table=True):
     n_pairs: int = 0
     metrics: Any = Field(default_factory=dict, sa_column=Column(JSON))
     created_at: datetime = Field(default_factory=now)
+
+
+class WhatsAppContact(SQLModel, table=True):
+    """Registry members who joined over WhatsApp (Twilio). Kept apart from the pseudonymised profile, like ContactDetail."""
+    profile_id: str = Field(primary_key=True)
+    phone_e164: str
+
+
+class WhatsAppThread(SQLModel, table=True):
+    """Routes an incoming WhatsApp message to the conversation it belongs to (an intake session or a recall call)."""
+    phone_e164: str = Field(primary_key=True)
+    kind: str = "intake"  # intake | recall
+    session_id: Optional[str] = None
+    call_id: Optional[int] = None
+    updated_at: datetime = Field(default_factory=now)

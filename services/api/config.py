@@ -46,12 +46,15 @@ class Settings(BaseSettings):
     tool_shared_secret: str = ""
     # Real outbound calls go ONLY to these E.164 numbers (comma-separated). Empty = no real calls; everyone gets a simulated call.
     outbound_allowlist: str = ""
-    # Twilio (only used by scripts/setup_elevenlabs.py to import an existing number into ElevenLabs)
+    # Twilio: number import into ElevenLabs (scripts/setup_elevenlabs.py) and the WhatsApp channel (voice/whatsapp.py)
     twilio_account_sid: str = ""
     twilio_auth_token: str = ""
     twilio_api_key_sid: str = ""
     twilio_api_key_secret: str = ""
     twilio_phone_number: str = ""
+    # WhatsApp via Twilio: sandbox ("whatsapp:+14155238886") or your approved WhatsApp sender. Text only.
+    twilio_whatsapp_from: str = ""
+    twilio_whatsapp_content_sid: str = ""  # optional approved template (needed outside the 24-hour reply window)
 
     # --- Offline generative LLM (preprocessing only) ---
     offline_llm_provider: str = "anthropic"
@@ -82,6 +85,11 @@ class Settings(BaseSettings):
     @property
     def outbound_allowed_numbers(self) -> set[str]:
         return {n.strip().replace(" ", "") for n in self.outbound_allowlist.split(",") if n.strip()}
+
+    @property
+    def whatsapp_ready(self) -> bool:
+        """Can receive (signature check needs the auth token) and send WhatsApp messages through Twilio."""
+        return bool(self.twilio_whatsapp_from and self.twilio_account_sid and self.twilio_auth_token)
 
     @property
     def elevenlabs_outbound_ready(self) -> bool:

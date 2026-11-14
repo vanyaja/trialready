@@ -16,7 +16,8 @@ from ..jev.questions import ethnicity_question, extract_questions, guard_questio
 from ..matching import adaptive, engine
 from ..matching import thresholds as T
 from ..matching.extract import merge_jev, rule_extract
-from ..models import Answer, CallLog, ContactDetail, CriterionScore, Outcome, Profile, Referral, ScreenSession, TrialScore, now
+from ..models import (Answer, CallLog, ContactDetail, CriterionScore, Outcome, Profile, Referral, ScreenSession, TrialScore, WhatsAppContact,
+                      WhatsAppThread, now)
 from ..trials.topics import TOPICS
 
 router = APIRouter(prefix="/api/tools", tags=["voice-tools"])
@@ -74,8 +75,10 @@ def delete_profile_data(db, profile_id: str, session_id: Optional[str] = None):
     for model in (CriterionScore, TrialScore, Referral, CallLog):
         db.exec(delete(model).where(model.profile_id == profile_id))
     db.exec(delete(ContactDetail).where(ContactDetail.profile_id == profile_id))
+    db.exec(delete(WhatsAppContact).where(WhatsAppContact.profile_id == profile_id))
     if session_id:
         db.exec(delete(Answer).where(Answer.session_id == session_id))
+        db.exec(delete(WhatsAppThread).where(WhatsAppThread.session_id == session_id))
     db.exec(delete(Profile).where(Profile.id == profile_id))
     engine.forget(profile_id)
 

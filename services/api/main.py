@@ -29,6 +29,7 @@ from .voice.tools_intake import FIRST_MESSAGE, create_session
 from .voice.tools_intake import router as intake_router
 from .voice.tools_recall import router as recall_router
 from .voice.webhooks import router as webhook_router
+from .voice.whatsapp import router as whatsapp_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 log = logging.getLogger("trialready")
@@ -66,7 +67,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="TrialReady", version="0.1.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-for r in (intake_router, recall_router, webhook_router, site_router):
+for r in (intake_router, recall_router, webhook_router, whatsapp_router, site_router):
     app.include_router(r)
 
 
@@ -352,7 +353,7 @@ def stats():
             "jev": get_router().snapshot(),
             "voice": {"elevenlabs_intake_agent": bool(s.elevenlabs_intake_agent_id), "outbound_ready": s.elevenlabs_outbound_ready,
                       "webhook_signed": bool(s.elevenlabs_webhook_secret), "tool_secret_set": bool(s.tool_shared_secret),
-                      "outbound_allowlist_count": len(s.outbound_allowed_numbers)},
+                      "outbound_allowlist_count": len(s.outbound_allowed_numbers), "whatsapp_ready": s.whatsapp_ready},
             "pes_mode": s.pes_mode}
 
 

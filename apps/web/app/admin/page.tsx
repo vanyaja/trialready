@@ -58,6 +58,7 @@ export default function Admin() {
             <span className="chip">{s.voice.outbound_ready ? "✓" : "–"} Outbound phone calls (ElevenLabs + Twilio)</span>
             <span className="chip">{s.voice.tool_secret_set ? "✓" : "–"} Tool secret</span>
             <span className="chip">{s.voice.webhook_signed ? "✓" : "–"} Signed post-call webhook</span>
+            <span className="chip">{s.voice.whatsapp_ready ? "✓" : "–"} WhatsApp (Twilio)</span>
             {!s.voice.outbound_ready && <span className="text-ink-mute">Without phone credentials, calls are simulated and can be answered in the browser.</span>}
           </div>
         )}

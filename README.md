@@ -14,6 +14,7 @@ AI Cup 2026 · Track D (Science & Engineering). Full build spec: [`AGENTS.md`](A
 | Intake loop: consent → adaptive questions → score every criterion of every candidate trial after each answer → top 3 in plain language → registry | Working end to end |
 | Rematch + recall: new trial → re-score registry → outbound call → re-check 1–2 things → book a slot → referral | Working end to end |
 | Nurse dashboard, registry, equity view (real Census 2021 figures), benchmark page | Working |
+| **WhatsApp (Twilio)** | Full intake by WhatsApp text and recall by WhatsApp message, through the same scripted agent and Jev-scored backend; Twilio signature checked on every message; outbound only to `OUTBOUND_ALLOWLIST`. Tested with a mocked Twilio; **not yet tried on a real phone** (no Twilio values in `.env`). Setup: [`docs/WHATSAPP_SETUP.md`](docs/WHATSAPP_SETUP.md) |
 | Trial data | 41 real UK interventional type 2 diabetes trials from ClinicalTrials.gov (35 recruiting + 6 not yet recruiting), fetched 14 Nov 2026, 669 atomic criteria |
 | **Jev** | Adapter for TypeSafe native → OpenRouter → AIML API is written and unit-tested against the documented schema, **but has not yet been called with a real key** (no key in `.env` as of 14 Nov, 10:00). `python scripts/jev_smoke.py` makes one real request per configured provider with no mock fallback. With no key the app runs on `MockJev` (keyword rules) and says so in the header badge |
 | **ElevenLabs / Twilio** | Tool endpoints, outbound-call client, signed post-call webhook and the web SDK component are written; `scripts/setup_elevenlabs.py` creates the tools, both agents (English + Polish preset) and the webhook from `.env` (payloads validated against the ElevenLabs OpenAPI schema). **Not yet run against a live account.** Real outbound calls only go to numbers in `OUTBOUND_ALLOWLIST`. Without credentials: a built-in scripted agent (typed or browser speech) and simulated calls you can answer in the browser |
@@ -67,16 +68,17 @@ Reset between rehearsals: `python scripts/seed_demo.py --reset` (or *Reset demo 
    ```
    Restart the API: the header badge turns green; if the preferred provider fails the router falls back down the chain (ending at MockJev) and the badge says so.
    Model IDs: TypeSafe native `jev-latest` (alias for the current release), AIML API `typesafe/jev`, OpenRouter `typesafe/jev-1.13` (pinned; bare `jev-latest` is also mapped onto the `typesafe/` namespace there). The resolved version is recorded from the response's `model` field.
-2. **ElevenLabs + Twilio** — start the tunnel, set `ELEVENLABS_API_KEY` and `PUBLIC_API_BASE_URL` in `.env`, then `python scripts/setup_elevenlabs.py --check` and `python scripts/setup_elevenlabs.py` (details and the manual fallback: [`docs/ELEVENLABS_SETUP.md`](docs/ELEVENLABS_SETUP.md)). Put the phone numbers that may receive real calls in `OUTBOUND_ALLOWLIST`.
-3. **Better criteria text** — with `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`: `python -m services.api.trials.ingest_ctgov --from-raw --llm` re-atomises the criteria and rewrites the plain-English text with the offline LLM, then restart (or `/admin` → Re-ingest).
-4. **Fresh trials** — `python -m services.api.trials.ingest_ctgov` (live fetch), or the nightly 02:00 job.
+2. **ElevenLabs + Twilio voice** — start the tunnel, set `ELEVENLABS_API_KEY` and `PUBLIC_API_BASE_URL` in `.env`, then `python scripts/setup_elevenlabs.py --check` and `python scripts/setup_elevenlabs.py` (details and the manual fallback: [`docs/ELEVENLABS_SETUP.md`](docs/ELEVENLABS_SETUP.md)). Put the phone numbers that may receive real calls in `OUTBOUND_ALLOWLIST`.
+3. **WhatsApp (Twilio sandbox)** — [`docs/WHATSAPP_SETUP.md`](docs/WHATSAPP_SETUP.md): join the sandbox, point it at `<PUBLIC_API_BASE_URL>/api/whatsapp/inbound`, set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`.
+4. **Better criteria text** — with `ANTHROPIC_API_KEY` or `OPENAI_API_KEY`: `python -m services.api.trials.ingest_ctgov --from-raw --llm` re-atomises the criteria and rewrites the plain-English text with the offline LLM, then restart (or `/admin` → Re-ingest).
+5. **Fresh trials** — `python -m services.api.trials.ingest_ctgov` (live fetch), or the nightly 02:00 job.
 
 ## Tests
 
 ```bash
-python -m pytest services/api/tests -q      # 16 tests, ~20 s, no network, no keys
+python -m pytest services/api/tests -q      # 20 tests, ~25 s, no network, no keys
 ```
-Covers spec §23: atomiser schema, scoring maths (`P_pes ≤ P_opt`, knock-out), adaptive topic choice, guard routing, live-only Jev mode never returns mock answers, persona replay (≤ 8 questions; heart-attack persona knocked out of cardio-exclusion trials), emergency phrase, "remove me", tool-secret enforcement, new trial → ≥ 2 outbound calls → booking visible to the nurse, browser-answered call, real calls only to allowlisted numbers, webhook signature, benchmark output.
+Covers spec §23: atomiser schema, scoring maths (`P_pes ≤ P_opt`, knock-out), adaptive topic choice, guard routing, live-only Jev mode never returns mock answers, persona replay (≤ 8 questions; heart-attack persona knocked out of cardio-exclusion trials), emergency phrase, "remove me", tool-secret enforcement, new trial → ≥ 2 outbound calls → booking visible to the nurse, browser-answered call, real calls only to allowlisted numbers, WhatsApp (Twilio signature, full text intake, recall message to booking, allowlist), webhook signature, benchmark output.
 
 Not covered by tests (needs accounts): live ElevenLabs web call latency, real outbound calls, real Jev responses.
 
@@ -150,4 +152,4 @@ Sources are listed in `AGENTS.md` §2.
 
 ## Privacy
 
-Profiles are pseudonymised; phone numbers live in a separate table and only for people who agreed to future contact. "Remove me" deletes the profile, answers, scores, referrals and number. After the event: `python scripts/purge.py --yes`.
+Profiles are pseudonymised; phone and WhatsApp numbers live in separate tables and only for people who agreed to future contact. "Remove me" deletes the profile, answers, scores, referrals and number. After the event: `python scripts/purge.py --yes`.

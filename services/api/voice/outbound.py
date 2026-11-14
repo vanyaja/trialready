@@ -53,11 +53,15 @@ async def place_call(referral_id: int, force_sim: bool = False) -> dict:
         plan = recheck_plan(prof, ref.trial_id)
         ref.recheck = {"plan": plan, "answers": {}}
         db.add(ref)
+        from . import whatsapp
         allowed = bool(contact and contact.phone_e164 and contact.phone_e164.replace(" ", "") in s.outbound_allowed_numbers)
-        if s.elevenlabs_outbound_ready and contact and not force_sim and not allowed:
+        wa_phone = whatsapp.contact_for(db, prof.id) if s.whatsapp_ready else None
+        wa = bool(wa_phone and wa_phone in s.outbound_allowed_numbers and not force_sim)  # joined on WhatsApp -> contact on WhatsApp
+        if not force_sim and ((s.elevenlabs_outbound_ready and contact and not allowed) or (wa_phone and not wa)):
             log.info("referral %s: number not in OUTBOUND_ALLOWLIST - simulated call instead of a real one", referral_id)
-        real = bool(s.elevenlabs_outbound_ready and allowed and not force_sim)
-        call = CallLog(direction="outbound", mode="elevenlabs" if real else "sim", profile_id=prof.id, trial_id=ref.trial_id, referral_id=ref.id, status="dialing")
+        real = bool(s.elevenlabs_outbound_ready and allowed and not force_sim and not wa)
+        mode = "whatsapp" if wa else ("elevenlabs" if real else "sim")
+        call = CallLog(direction="outbound", mode=mode, profile_id=prof.id, trial_id=ref.trial_id, referral_id=ref.id, status="dialing")
         db.add(call)
         db.commit()
         db.refresh(call)
@@ -66,7 +70,9 @@ async def place_call(referral_id: int, force_sim: bool = False) -> dict:
         view = {"call_id": call.id, "referral_id": ref.id, "status": "dialing", "mode": call.mode, "person": prof.first_name or f"P-{prof.id[:6]}",
                 "lay_title": dv["trial_lay_title"], "site": dv["site_name"]}
     bus.publish("call_status", view)
-    if real:
+    if wa:
+        asyncio.ensure_future(whatsapp.start_recall(call.id, referral_id, wa_phone, dv))
+    elif real:
         asyncio.ensure_future(_elevenlabs_call(call.id, referral_id, to_number, dv))
     else:
         _claimed[call.id] = False
