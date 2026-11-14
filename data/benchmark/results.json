@@ -1,0 +1,306 @@
+{
+ "created_at": "2026-11-14T00:48:02.338764+00:00",
+ "model": "mock:mock-rules",
+ "mock": true,
+ "fallback_mode": false,
+ "warning": "MOCK RUN: keyword rules, not Jev. These numbers are a pipeline smoke test and say nothing about any model.",
+ "dataset": {
+  "name": "ncbi/TrialGPT-Criterion-Annotations",
+  "total_pairs": 1015,
+  "sampled": 500,
+  "answered": 500,
+  "sampling": "stratified by criterion type x expert label, seed 7"
+ },
+ "mappings": {
+  "drop_not_applicable": {
+   "description": "Expert 'not applicable' pairs dropped; 3-way met/not_met/unknown.",
+   "n": 469,
+   "accuracy": 0.6972,
+   "accuracy_inclusion": 0.5471,
+   "accuracy_exclusion": 0.7826,
+   "n_inclusion": 170,
+   "n_exclusion": 299,
+   "macro_f1": 0.579,
+   "confusion": {
+    "met": {
+     "met": 21,
+     "not_met": 8,
+     "unknown": 53
+    },
+    "not_met": {
+     "met": 3,
+     "not_met": 234,
+     "unknown": 8
+    },
+    "unknown": {
+     "met": 13,
+     "not_met": 57,
+     "unknown": 72
+    }
+   },
+   "ece": 0.0503,
+   "reliability": [
+    {
+     "bin": "0.0-0.1",
+     "mid": 0.05,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "bin": "0.1-0.2",
+     "mid": 0.15,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "bin": "0.2-0.3",
+     "mid": 0.25,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "bin": "0.3-0.4",
+     "mid": 0.35,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "bin": "0.4-0.5",
+     "mid": 0.45,
+     "n": 1,
+     "confidence": 0.4424,
+     "accuracy": 0.0
+    },
+    {
+     "bin": "0.5-0.6",
+     "mid": 0.55,
+     "n": 77,
+     "confidence": 0.5575,
+     "accuracy": 0.5325
+    },
+    {
+     "bin": "0.6-0.7",
+     "mid": 0.65,
+     "n": 263,
+     "confidence": 0.6531,
+     "accuracy": 0.7338
+    },
+    {
+     "bin": "0.7-0.8",
+     "mid": 0.75,
+     "n": 128,
+     "confidence": 0.7264,
+     "accuracy": 0.7266
+    },
+    {
+     "bin": "0.8-0.9",
+     "mid": 0.85,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "bin": "0.9-1.0",
+     "mid": 0.95,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    }
+   ]
+  },
+  "not_applicable_as_unknown": {
+   "description": "Expert 'not applicable' mapped to unknown.",
+   "n": 500,
+   "accuracy": 0.67,
+   "accuracy_inclusion": 0.5674,
+   "accuracy_exclusion": 0.7267,
+   "n_inclusion": 178,
+   "n_exclusion": 322,
+   "macro_f1": 0.5626,
+   "confusion": {
+    "met": {
+     "met": 21,
+     "not_met": 8,
+     "unknown": 53
+    },
+    "not_met": {
+     "met": 3,
+     "not_met": 234,
+     "unknown": 8
+    },
+    "unknown": {
+     "met": 13,
+     "not_met": 80,
+     "unknown": 80
+    }
+   },
+   "ece": 0.0377,
+   "reliability": [
+    {
+     "bin": "0.0-0.1",
+     "mid": 0.05,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "bin": "0.1-0.2",
+     "mid": 0.15,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "bin": "0.2-0.3",
+     "mid": 0.25,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "bin": "0.3-0.4",
+     "mid": 0.35,
+     "n": 1,
+     "confidence": 0.3794,
+     "accuracy": 0.0
+    },
+    {
+     "bin": "0.4-0.5",
+     "mid": 0.45,
+     "n": 1,
+     "confidence": 0.4424,
+     "accuracy": 0.0
+    },
+    {
+     "bin": "0.5-0.6",
+     "mid": 0.55,
+     "n": 81,
+     "confidence": 0.5585,
+     "accuracy": 0.5556
+    },
+    {
+     "bin": "0.6-0.7",
+     "mid": 0.65,
+     "n": 282,
+     "confidence": 0.6534,
+     "accuracy": 0.6986
+    },
+    {
+     "bin": "0.7-0.8",
+     "mid": 0.75,
+     "n": 135,
+     "confidence": 0.7261,
+     "accuracy": 0.6889
+    },
+    {
+     "bin": "0.8-0.9",
+     "mid": 0.85,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    },
+    {
+     "bin": "0.9-1.0",
+     "mid": 0.95,
+     "n": 0,
+     "confidence": null,
+     "accuracy": null
+    }
+   ]
+  }
+ },
+ "latency": {
+  "request_p50_ms": 0.1,
+  "request_p95_ms": 0.2,
+  "per_decision_p50_ms": 0.0,
+  "per_decision_p95_ms": 0.0,
+  "histogram": [
+   {
+    "bucket": "0-100 ms",
+    "n": 53
+   },
+   {
+    "bucket": "100-200 ms",
+    "n": 0
+   },
+   {
+    "bucket": "200-300 ms",
+    "n": 0
+   },
+   {
+    "bucket": "300-500 ms",
+    "n": 0
+   },
+   {
+    "bucket": "500-750 ms",
+    "n": 0
+   },
+   {
+    "bucket": "750-1000 ms",
+    "n": 0
+   },
+   {
+    "bucket": "1000-1500 ms",
+    "n": 0
+   },
+   {
+    "bucket": "1500-2500 ms",
+    "n": 0
+   },
+   {
+    "bucket": "2500-5000 ms",
+    "n": 0
+   },
+   {
+    "bucket": ">5000 ms",
+    "n": 0
+   }
+  ],
+  "requests": 53
+ },
+ "cost": {
+  "input_tokens": 67893,
+  "usd_total": 0.002852,
+  "usd_per_1000_criteria": 0.0057,
+  "price_per_m_input_usd": 0.042,
+  "label": "vendor price x estimated tokens (mock)"
+ },
+ "threshold": {
+  "met_cutoff": null,
+  "target_precision": 0.9,
+  "note": "Criterion-level P(met) cut-off reaching 0.9 precision on 'met'. Per-criterion, so not directly a trial-level P_pes threshold."
+ },
+ "comparison": [
+  {
+   "label": "Jev (mock:mock-rules) - MOCK",
+   "accuracy": 0.6972,
+   "macro_f1": 0.579,
+   "ece": 0.0503,
+   "n": 469,
+   "rerun": true
+  },
+  {
+   "label": "TrialGPT (GPT-4) labels in the dataset, same pairs, our 3-way mapping",
+   "accuracy": 0.8678,
+   "macro_f1": 0.8723,
+   "ece": null,
+   "n": 469,
+   "rerun": false,
+   "note": "Recomputed from the dataset's stored GPT-4 predictions; model not re-run."
+  },
+  {
+   "label": "TrialGPT-Matching (GPT-4), reported",
+   "accuracy": 0.873,
+   "n": 1015,
+   "note": "Reported in Jin et al., Nature Communications 2024 (doi:10.1038/s41467-024-53081-z) on its own label set - not re-run here.",
+   "reported_not_rerun": true,
+   "macro_f1": null,
+   "ece": null,
+   "rerun": false
+  }
+ ]
+}

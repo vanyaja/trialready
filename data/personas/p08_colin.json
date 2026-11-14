@@ -1,0 +1,27 @@
+{
+ "id": "p08_colin",
+ "synthetic": true,
+ "first_name": "Colin",
+ "description": "79-year-old white British man. Type 2 diabetes for 20 years, insulin only, chronic kidney disease stage 4, stroke 3 years ago, HbA1c 80, BMI 26.",
+ "language": "en",
+ "how_they_talk": "Hard of hearing; answers slowly.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "Seventy-nine, male.",
+  "location_travel": "N 1",
+  "diagnosis_duration": "Type 2, twenty years ago.",
+  "diabetes_meds": "Insulin, that's all.",
+  "hba1c": "80.",
+  "weight_bmi": "BMI 26.",
+  "kidney": "Yes, stage 4 kidney disease.",
+  "cardio_recent": "I had a stroke 3 years ago.",
+  "cancer_recent": "No.",
+  "other_trial_recent": "No.",
+  "ethnicity": "White British."
+ },
+ "expected": {
+  "demo_trial": "knocked_out",
+  "reason": "insulin"
+ }
+}

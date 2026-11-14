@@ -1,0 +1,26 @@
+{
+ "id": "p06_samuel",
+ "synthetic": true,
+ "first_name": "Samuel",
+ "description": "61-year-old Black African (Nigerian) man. Type 2 diabetes for 9 years, metformin + weekly semaglutide, HbA1c 58, BMI 34.",
+ "language": "en",
+ "how_they_talk": "Warm, formal. Says 'by the grace of God'.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "I am sixty-one years old, a man.",
+  "location_travel": "S E 1",
+  "diagnosis_duration": "Type 2 diabetes, nine years ago.",
+  "diabetes_meds": "Metformin, and Ozempic once a week.",
+  "hba1c": "58.",
+  "weight_bmi": "My BMI is 34.",
+  "kidney": "No, they are fine.",
+  "cardio_recent": "No, never.",
+  "cancer_recent": "No.",
+  "other_trial_recent": "No.",
+  "ethnicity": "Black African, Nigerian."
+ },
+ "expected": {
+  "demo_trial": "match"
+ }
+}

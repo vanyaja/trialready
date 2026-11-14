@@ -1,0 +1,27 @@
+{
+ "id": "p10_tom",
+ "synthetic": true,
+ "first_name": "Tom",
+ "description": "38-year-old white Irish man. Type 2 diabetes for 3 years, metformin, HbA1c 72, BMI 36, already taking part in another study.",
+ "language": "en",
+ "how_they_talk": "Jokes a lot; goes off-topic.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "Thirty-eight, male.",
+  "location_travel": "S W 9",
+  "diagnosis_duration": "Type 2, 3 years ago.",
+  "diabetes_meds": "Metformin.",
+  "hba1c": "72.",
+  "weight_bmi": "BMI 36.",
+  "kidney": "No.",
+  "cardio_recent": "No.",
+  "cancer_recent": "No.",
+  "other_trial_recent": "Yes, I'm taking part in another study at the moment.",
+  "ethnicity": "White Irish."
+ },
+ "expected": {
+  "demo_trial": "knocked_out",
+  "reason": "in another study"
+ }
+}

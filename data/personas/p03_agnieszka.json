@@ -1,0 +1,27 @@
+{
+ "id": "p03_agnieszka",
+ "synthetic": true,
+ "first_name": "Agnieszka",
+ "description": "45-year-old Polish woman, diagnosed 8 months ago, metformin only, HbA1c 55, BMI 29. Prefers Polish; this script is the English version.",
+ "language": "pl",
+ "how_they_talk": "Careful English, asks for repeats. Precise with dates.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "I am forty-five, female.",
+  "location_travel": "W 3",
+  "diagnosis_duration": "Yes, type 2 diabetes, 8 months ago.",
+  "diabetes_meds": "Only metformin.",
+  "hba1c": "Fifty-five.",
+  "weight_bmi": "BMI 29.",
+  "kidney": "No problems.",
+  "cardio_recent": "No.",
+  "cancer_recent": "No.",
+  "pregnancy": "No, I am not.",
+  "other_trial_recent": "No.",
+  "ethnicity": "White Polish."
+ },
+ "expected": {
+  "demo_trial": "match"
+ }
+}

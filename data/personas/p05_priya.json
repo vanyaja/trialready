@@ -1,0 +1,28 @@
+{
+ "id": "p05_priya",
+ "synthetic": true,
+ "first_name": "Priya",
+ "description": "34-year-old British Indian woman, 20 weeks pregnant. Type 2 diabetes for 2 years, metformin, HbA1c 50, BMI 27.",
+ "language": "en",
+ "how_they_talk": "Fast talker, a little anxious about the pregnancy.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "I'm thirty-four, female.",
+  "location_travel": "N W 10",
+  "diagnosis_duration": "Type 2, about 2 years ago.",
+  "diabetes_meds": "Just metformin.",
+  "hba1c": "Fifty.",
+  "weight_bmi": "BMI 27.",
+  "kidney": "No.",
+  "cardio_recent": "No.",
+  "cancer_recent": "No.",
+  "pregnancy": "Yes, I'm pregnant, 20 weeks.",
+  "other_trial_recent": "No.",
+  "ethnicity": "British Indian."
+ },
+ "expected": {
+  "demo_trial": "knocked_out",
+  "reason": "pregnancy"
+ }
+}

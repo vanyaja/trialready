@@ -1,0 +1,28 @@
+{
+ "id": "p09_mei",
+ "synthetic": true,
+ "first_name": "Mei",
+ "description": "49-year-old Chinese woman. Type 2 diabetes for 1 year, diet only, HbA1c 50, BMI 24.",
+ "language": "en",
+ "how_they_talk": "Precise, slightly sceptical of research.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "Forty-nine, female.",
+  "location_travel": "N 7",
+  "diagnosis_duration": "Type 2, 1 year ago.",
+  "diabetes_meds": "Nothing, just diet.",
+  "hba1c": "Fifty.",
+  "weight_bmi": "BMI 24.",
+  "kidney": "No.",
+  "cardio_recent": "No.",
+  "cancer_recent": "No.",
+  "pregnancy": "No.",
+  "other_trial_recent": "No.",
+  "ethnicity": "Chinese."
+ },
+ "expected": {
+  "demo_trial": "knocked_out",
+  "reason": "not on metformin"
+ }
+}

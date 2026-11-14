@@ -1,0 +1,26 @@
+{
+ "id": "p01_imran",
+ "synthetic": true,
+ "first_name": "Imran",
+ "description": "58-year-old British Pakistani man. Type 2 diabetes for 6 years, metformin + gliclazide, HbA1c 64 mmol/mol, BMI 31. Prefers Urdu; this script is the English version.",
+ "language": "ur",
+ "how_they_talk": "Short, polite answers. Knows his numbers because his daughter writes them down.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "I'm fifty-eight, male.",
+  "location_travel": "E 1",
+  "diagnosis_duration": "Yes, type 2. About six years ago.",
+  "diabetes_meds": "Metformin and gliclazide.",
+  "hba1c": "Sixty-four at the last test.",
+  "weight_bmi": "My BMI is 31.",
+  "kidney": "No, my kidneys are fine.",
+  "cardio_recent": "No, never.",
+  "cancer_recent": "No.",
+  "other_trial_recent": "No, I'm not.",
+  "ethnicity": "British Pakistani."
+ },
+ "expected": {
+  "demo_trial": "match"
+ }
+}

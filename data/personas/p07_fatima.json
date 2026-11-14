@@ -1,0 +1,27 @@
+{
+ "id": "p07_fatima",
+ "synthetic": true,
+ "first_name": "Fatima",
+ "description": "52-year-old British Bangladeshi woman. Type 2 diabetes for 4 years, metformin + sitagliptin, HbA1c 69, BMI 27. Prefers Bengali (Sylheti); this script is the English version.",
+ "language": "bn",
+ "how_they_talk": "Soft-spoken; her son sometimes answers for her.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "Fifty-two. I am a woman.",
+  "location_travel": "E 1",
+  "diagnosis_duration": "Yes, type 2. Four years ago.",
+  "diabetes_meds": "Metformin and sitagliptin.",
+  "hba1c": "69.",
+  "weight_bmi": "BMI 27.",
+  "kidney": "No.",
+  "cardio_recent": "No.",
+  "cancer_recent": "No.",
+  "pregnancy": "No.",
+  "other_trial_recent": "No.",
+  "ethnicity": "Bangladeshi."
+ },
+ "expected": {
+  "demo_trial": "match"
+ }
+}

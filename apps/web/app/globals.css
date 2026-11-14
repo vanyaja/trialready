@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { font-size: 15px; color-scheme: dark; }
+html.stage { font-size: 19px; }
+body { @apply bg-surface text-ink antialiased; }
+::selection { background: #3987e5; color: #fff; }
+.card { @apply rounded-xl border border-surface-line bg-surface-raised; }
+.label { @apply text-[0.72rem] font-semibold uppercase tracking-wider text-ink-mute; }
+.btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-40; }
+.btn-primary { @apply btn bg-brand text-white hover:brightness-110; }
+.btn-ghost { @apply btn border border-surface-line text-ink-soft hover:bg-surface-line/50; }
+.btn-danger { @apply btn bg-critical text-white hover:brightness-110; }
+.input { @apply w-full rounded-lg border border-surface-line bg-surface-sunk px-3 py-2 text-sm text-ink placeholder:text-ink-mute focus:border-brand focus:outline-none; }
+.chip { @apply inline-flex items-center gap-1 rounded-full border border-surface-line px-2.5 py-0.5 text-xs font-medium text-ink-soft; }
+.scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: #26334f; border-radius: 8px; }
+@keyframes ring { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-14deg); } 40% { transform: rotate(12deg); } 60% { transform: rotate(-8deg); } 80% { transform: rotate(6deg); } }
+.ringing { animation: ring 0.9s ease-in-out infinite; display: inline-block; }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+.live-dot { animation: pulse-dot 1.2s ease-in-out infinite; }

@@ -1,0 +1,27 @@
+{
+ "id": "p02_marcia",
+ "synthetic": true,
+ "first_name": "Marcia",
+ "description": "67-year-old Black Caribbean woman. Type 2 diabetes for 15 years, on insulin and metformin, chronic kidney disease stage 3, HbA1c 75, BMI 33.",
+ "language": "en",
+ "how_they_talk": "Chatty, adds context. Calls the nurse 'my diabetes lady'.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "Sixty-seven, and I'm a woman.",
+  "location_travel": "S E 15",
+  "diagnosis_duration": "Type 2, fifteen years now.",
+  "diabetes_meds": "I'm on insulin twice a day, and metformin.",
+  "hba1c": "It was 75 I think.",
+  "weight_bmi": "BMI 33 they told me.",
+  "kidney": "Yes, C K D stage 3 they call it.",
+  "cardio_recent": "No, thank God.",
+  "cancer_recent": "No.",
+  "other_trial_recent": "No.",
+  "ethnicity": "Black Caribbean."
+ },
+ "expected": {
+  "demo_trial": "knocked_out",
+  "reason": "insulin"
+ }
+}

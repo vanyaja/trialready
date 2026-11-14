@@ -1,0 +1,28 @@
+{
+ "id": "p04_derek",
+ "synthetic": true,
+ "first_name": "Derek",
+ "description": "72-year-old white British man. Type 2 diabetes for 12 years, metformin + dapagliflozin, heart attack 4 months ago, HbA1c 61, BMI 28.",
+ "language": "en",
+ "how_they_talk": "Gruff, brief. Mentions his heart attack without being asked.",
+ "script": {
+  "consent": "Yes, that's fine.",
+  "future_contact": "Yes please, you can call me.",
+  "age_sex": "Seventy-two. Male.",
+  "location_travel": "N 17",
+  "diagnosis_duration": "Type 2. Twelve years.",
+  "diabetes_meds": "Metformin and dapagliflozin.",
+  "hba1c": "61.",
+  "weight_bmi": "BMI is 28.",
+  "kidney": "No.",
+  "cardio_recent": "Yes, I had a heart attack 4 months ago.",
+  "cancer_recent": "No.",
+  "other_trial_recent": "No.",
+  "ethnicity": "White British."
+ },
+ "expected": {
+  "demo_trial": "knocked_out",
+  "reason": "heart attack 4 months ago",
+  "must_knock_out_topic": "cardio_recent"
+ }
+}

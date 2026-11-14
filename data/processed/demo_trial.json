@@ -1,0 +1,18 @@
+{
+ "id": "DEMO-001",
+ "title": "DEMO (fictional): a phone-based coaching programme for adults with type 2 diabetes treated with metformin",
+ "lay_title": "Demo trial (fictional): phone coaching for type 2 diabetes",
+ "lay_summary": "A fictional study used only for this demonstration. It would test a phone-based coaching programme for adults with type 2 diabetes who take metformin. Taking part would mean one visit in central London and a monthly phone call.",
+ "phase": "NA", "status": "RECRUITING", "conditions": ["Type 2 Diabetes"], "min_age": 18, "max_age": 80, "sex": "ALL",
+ "sites": [{"name": "TrialReady Demo Research Site (fictional)", "city": "London", "lat": 51.5246, "lon": -0.134}],
+ "last_update": "", "source": "demo",
+ "criteria": [
+  {"id": "DEMO-001__inc_1", "kind": "inclusion", "text": "Aged 18 to 80 years", "lay_text": "You are between 18 and 80 years old", "topic": "age_sex", "hard_filter": true, "cohort_specific": false},
+  {"id": "DEMO-001__inc_2", "kind": "inclusion", "text": "Diagnosed with type 2 diabetes at least 6 months ago", "lay_text": "You have had type 2 diabetes for at least six months", "topic": "diagnosis_duration", "hard_filter": false, "cohort_specific": false},
+  {"id": "DEMO-001__inc_3", "kind": "inclusion", "text": "Currently treated with metformin", "lay_text": "You take metformin", "topic": "diabetes_meds", "hard_filter": false, "cohort_specific": false},
+  {"id": "DEMO-001__exc_1", "kind": "exclusion", "text": "Currently treated with insulin", "lay_text": "You use insulin", "topic": "diabetes_meds", "hard_filter": false, "cohort_specific": false},
+  {"id": "DEMO-001__exc_2", "kind": "exclusion", "text": "Pregnant or breastfeeding", "lay_text": "You are pregnant or breastfeeding", "topic": "pregnancy", "hard_filter": false, "cohort_specific": false},
+  {"id": "DEMO-001__exc_3", "kind": "exclusion", "text": "Myocardial infarction or stroke within the last 6 months", "lay_text": "You had a heart attack or stroke in the last six months", "topic": "cardio_recent", "hard_filter": false, "cohort_specific": false},
+  {"id": "DEMO-001__exc_4", "kind": "exclusion", "text": "Currently taking part in another interventional research study", "lay_text": "You are in another research study at the moment", "topic": "other_trial_recent", "hard_filter": false, "cohort_specific": false}
+ ]
+}
